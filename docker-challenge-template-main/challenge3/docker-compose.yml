@@ -1,0 +1,39 @@
+version: '3'
+services:
+  nginx:
+    #image: nginx:latest    this was not needed as it is a base image with no customization
+    #builds the nginx image from the Dockerfile in the docker/nginx directory
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    #depends on the node-service container to be up and running before starting
+    depends_on:
+      - node-service
+
+  node-service:
+    #image: node:latest   this was not needed as it is a base image with no customization
+    #builds the node-service image from the Dockerfile in the docker/api directory
+    build:
+      context: ./docker/api
+      dockerfile: Dockerfile
+    ports:
+      - "3000"
+    deploy:
+      replicas: 3
+    depends_on:
+      - db
+    env_file:
+      - variables.env
+
+  db:
+    #image: mariadb:latest   this was not needed as it is a base image with no customization
+    #builds the db image from the Dockerfile in the docker/db directory
+    build:
+      context: ./docker/db
+      dockerfile: Dockerfile
+    ports:
+      - "3306:3306"
+    env_file:
+      - variables.env
